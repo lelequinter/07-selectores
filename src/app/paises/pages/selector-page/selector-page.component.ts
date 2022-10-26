@@ -13,16 +13,15 @@ import { PaisesServiceService } from '../../services/paises-service.service';
 export class SelectorPageComponent implements OnInit {
 
   miFormulario: FormGroup = this.fb.group({
-    region    : ['', Validators.required],
-    pais      : ['', Validators.required],
-    frontera  : ['', Validators.required],
+    region: ['', Validators.required],
+    pais: ['', Validators.required],
+    frontera: ['', Validators.required],
   });
 
   //llenar selectores
-
   regiones: string[] = [];
   paises: PaisSmall[] = [];
-  // fronteras: Pais;
+  fronteras: string[] = [];
 
   constructor(private fb: FormBuilder,
     private paisesSvc: PaisesServiceService) { }
@@ -32,28 +31,29 @@ export class SelectorPageComponent implements OnInit {
 
     //Cuando cambie la region
     this.miFormulario.get('region')?.valueChanges
-    .pipe(
-      tap( _ => {
-        this.miFormulario.get('pais')?.reset('')
-      }),
-      switchMap(region => this.paisesSvc.getPaisesPorRegion(region))
-    )
-    .subscribe(paises => {
-      // console.log(paises);
-      this.paises = paises
-    })
+      .pipe(
+        tap(() => {
+          this.miFormulario.get('pais')?.reset('');
+        }),
+        switchMap(region => this.paisesSvc.getPaisesPorRegion(region))
+      )
+      .subscribe(paises => {
+        // console.log(paises);
+        this.paises = paises
+      })
 
     this.miFormulario.get('pais')?.valueChanges
-    // .pipe(
-    //   tap( pais => {
-    //     console.log(pais);
-
-    //   } )
-    // )
-    .subscribe( pais => {
-      console.log(pais);
-
-    } )
+      .pipe(
+        tap(() => {
+          this.fronteras = [];
+          this.miFormulario.get('frontera')?.reset();
+        }),
+        switchMap(codigo => this.paisesSvc.getPaisPorCodigo(codigo))
+      )
+      .subscribe(pais => {
+        // console.log(pais);
+        this.fronteras = pais?.borders || [];
+      })
 
     // this.miFormulario.get('region')?.valueChanges
     //   .subscribe(region => {
